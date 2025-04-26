@@ -67,7 +67,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: success()
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           image-ref: ${{ steps.build-image.outputs.image }}
           format: 'table'
