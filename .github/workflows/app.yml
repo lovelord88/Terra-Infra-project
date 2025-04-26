@@ -1,0 +1,115 @@
+name: Deploy Netflix
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'readme.md'
+      - '.github/workflows/infra.yml'
+      - 'docs/**'
+      - 'infra/**'
+      - 'modules/**'
+  workflow_dispatch:
+  
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  CONTAINER_NAME: ${{vars.CONTAINER_NAME}}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+
+permissions:
+  id-token: write
+  contents: write 
+
+jobs:
+  deploy:
+    name: Deploy Netflix
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/GithubActions
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActions
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: anothrNick/github-tag-action@1.71.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          release_branches: main
+          fetch_all_tags: true
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: "${{ secrets.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com"
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ steps.tag_version.outputs.tag }}
+        run: |
+          docker build --build-arg TMDB_V3_API_KEY=${{ secrets.TMDB_V3_API_KEY }} -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Run Trivy vulnerability scanner
+        if: success()
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          image-ref: ${{ steps.build-image.outputs.image }}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH'
+
+      - name: Fetch task definition and save to file
+        if: success()
+        id: fetch-task-def
+        run: |
+          TASK_DEFINITION=$(aws ecs describe-services --cluster ${{env.ECS_CLUSTER}} --service ${{env.ECS_SERVICE}} --query "services[0].taskDefinition" --output text)
+          aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query 'taskDefinition | {
+            family: family,
+            containerDefinitions: containerDefinitions,
+            cpu: cpu,
+            memory: memory,
+            networkMode: networkMode,
+            requiresCompatibilities: requiresCompatibilities,
+            executionRoleArn: executionRoleArn,
+            taskRoleArn: taskRoleArn,
+            volumes: volumes
+          }' > task-definition.json
+          ls -la
+          pwd
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        if: success()
+        uses: aws-actions/amazon-ecs-render-task-definition@7ba85bc986550c0f059ada9b3916f695232f8863
+        with:
+          task-definition: ./app/task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        if: success()
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          
