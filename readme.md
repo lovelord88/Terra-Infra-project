@@ -27,12 +27,12 @@ Below is a high-level view  of the AWS infrastructure and CI/CD process. It incl
 
 ---
 
-## Deployed Application
+<!-- ## Deployed Application
 
 To access the deployed application, please visit the URL:  
-**https://netflix.viviennedofit./**
+<!-- **https://netflix.viviennedofit./** -->
 
-<!-- ![Alt text](docs/website.png "Screenshot of Netflix Website") -->
+<!-- ![Alt text](docs/website.png "Screenshot of Netflix Website") --> -->
 
 ---
 
