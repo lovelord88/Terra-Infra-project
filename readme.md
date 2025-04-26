@@ -14,7 +14,6 @@ If you chance on this project and you use it and love it, feel free to reach out
 
 ---
 
-Would you like an even shorter one if you want it super compact? 🔥
 
 ## Architecture Diagram
 
