@@ -107,8 +107,10 @@ resource "aws_iam_role_policy" "ecs_auto_scale_custom_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      
       {
         Effect = "Allow"
+        
         Action = [
           "application-autoscaling:RegisterScalableTarget",
           "application-autoscaling:DeregisterScalableTarget",
