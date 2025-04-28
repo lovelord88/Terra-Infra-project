@@ -40,9 +40,9 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-north-1
-          role-to-assume: arn:aws:iam::711387141889:role/github-actions-role
+          role-to-assume: arn:aws:iam::711387141889:role/transactly-github-actions-role
           role-session-name: github-${{ github.run_id }}
-          role-source-account-id: 711387141889 
+          role-source-account-id: ${{ secrets.AWS_ACCOUNT_ID }} 
         
       - name: Verify access
         run: aws sts get-caller-identity
