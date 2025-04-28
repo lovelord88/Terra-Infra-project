@@ -1,0 +1,11 @@
+name              = "transactly"
+account_name      = "vivienne"
+region            = "eu-north-1"
+dns_record_name   = "*.viviennedofit.com"
+cname_record_name = "netflix.viviennedofit.com"
+domain_name       = "viviennedofit.com"
+vpc_name          = "netflix"
+vpc_cidr          = "10.0.0.0/16"
+public_subnets    = ["10.0.0.0/24", "10.0.1.0/24"]
+private_subnets   = ["10.0.3.0/24", "10.0.4.0/24"]
+vpn_cidr          = "154.161.187.134/32"
