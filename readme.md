@@ -59,7 +59,7 @@ Sensitive data and configuration values are managed securely throughout the setu
 - **AWS SSM Parameter Store**:  
   - Within the infrastructure setup (Terraform code), sensitive data—such as VPC IDs, subnet IDs, TLS certificate ARNs, etc.—are retrieved from AWS Systems Manager (SSM) Parameter Store. 
 
-![Alt text](/home/vay/Pictures/Screenshots/data-sources.png "Screenshot of Data Sources in Terraform")
+![Alt text](ASSIGNMENT-IMAGES/datasources.png "Screenshot of Data Sources in Terraform")
 
   - This avoids hardcoding sensitive information in infrastructure code, promoting secure and maintainable practices.
 
