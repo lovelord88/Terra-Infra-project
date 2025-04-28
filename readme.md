@@ -111,6 +111,40 @@ The GitHub Actions workflows (`app.yml` and `infra.yml`) automate builds, vulner
 
 ![Alt text](docs/ecs-deploy.png "Screenshot of ECS Deployment") -->
 
+## Amazon ECS Automatic Dashboard Monitoring  
+
+## Overview  
+Amazon ECS integrates with CloudWatch to auto-generate dashboards for monitoring applications. These provide real-time metrics (CPU, memory, disk, network) without manual setup.  
+
+## How It Works  
+1. **Container Insights**:  
+   - Enabled in ECS to auto-collect metrics (CPU, memory, disk I/O, network).  
+2. **Service-Linked Role**:  
+   - ECS creates `AWSServiceRoleForECS` to publish metrics to CloudWatch.  
+3. **Auto-Generated Dashboards**:  
+   - Named `ECS-ClusterName-ContainerInsights`.  
+   - Shows: CPU/memory usage, network stats, task counts, and trends.  
+4. **Logs**: Collected if logging drivers (e.g., `awslogs`) are enabled.  
+
+## Customization  
+- **Clone & Edit**: Modify the auto-generated dashboard.  
+- **Alarms**: Set thresholds (e.g., high CPU) with SNS notifications.  
+
+## Key Metrics  
+| Metric              | Description                          |  
+|---------------------|--------------------------------------|  
+| `CPUUtilization`    | CPU usage by tasks (%)               |  
+| `MemoryUtilization` | Memory usage by tasks (%)            |  
+| `NetworkBytesIn`    | Incoming network traffic             |  
+| `RunningTaskCount`  | Number of active tasks               |  
+
+## Conclusion  
+Container Insights automates ECS monitoring in CloudWatch. Extend with AWS X-Ray or OpenTelemetry for advanced use cases.  
+
+ ![Alt text](ASSIGNMENT-IMAGES/monitoring-dasboard.png "Screenshot of Cloudwatch Monitoring Dashboard Images")
+
+ ![Alt text](ASSIGNMENT-IMAGES/alarm.png "Screenshot of Monitoring Dashbord in Alarm State Images")
+
 **SOC 2 Control Alignment**:
 - **CC8.1 (Change Management)**: Only authorized, fully scanned images are deployed.
 - **CC6.1 – CC6.3 (Logical Access)**: OIDC-based AWS credentials control who can push images and assume roles.
