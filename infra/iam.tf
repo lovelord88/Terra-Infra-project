@@ -195,7 +195,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 # Role GitHub Actions can assume
-resource "aws_iam_role" "github_actions" {
+resource "aws_iam_role" "github-actions-role" {
   name = "${var.name}-github-actions-role"
 
   assume_role_policy = jsonencode({
@@ -203,7 +203,7 @@ resource "aws_iam_role" "github_actions" {
     Statement = [{
       Effect = "Allow"
       Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
+        Federated = "aws_iam_openid_connect_provider.github.arn"
       }
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
