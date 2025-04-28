@@ -138,7 +138,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 resource "aws_iam_role" "github_actions_role" {
-  name = "${var.name}-github-actions-role"
+  name = "${var.name}transactly-github-actions-role"
 
   # This is the only part that needs careful updating
   assume_role_policy = jsonencode({
