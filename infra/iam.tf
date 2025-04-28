@@ -160,26 +160,30 @@ resource "aws_iam_role" "github_actions_role" {
     }]
   })
 }
-
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["*"],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sts:AssumeRole",
-        "sts:TagSession",
-        "sts:AssumeRoleWithWebIdentity",
-        "sts:GetCallerIdentity"
-      ],
-      "Resource": "*"
-    }
-  ]
+resource "aws_iam_policy" "example" {
+  name        = "example-policy"
+  description = "Example IAM policy"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = ["*"],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession",
+          "sts:AssumeRoleWithWebIdentity",
+          "sts:GetCallerIdentity"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 # OIDC provider for GitHub Actions
