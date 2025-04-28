@@ -131,54 +131,27 @@ resource "aws_iam_role_policy" "ecs_auto_scale_custom_policy" {
   })
 }
 
-resource "aws_iam_openid_connect_provider" "github" {
-  url = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"] # Current thumbprint
+resource "aws_iam_user" "github_actions_user" {
+  name = "github-actions-user"
 }
 
-resource "aws_iam_role" "github_actions_role" {
-  name = "${var.name}-github-actions-role"
-
-  # This is the only part that needs careful updating
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-        }
-        StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:lovelord88/Terra-Infra-project:*"
-        }
-      }
-    }]
-  })
+resource "aws_iam_access_key" "github_actions_key" {
+  user = aws_iam_user.github_actions_user.name
 }
-resource "aws_iam_policy" "github-actions" {
-  name        = "transactly-github-actions"
-  description = "Github action IAM policy"
-  
+
+resource "aws_iam_user_policy" "github_actions_policy" {
+  name = "github-actions-policy"
+  user = aws_iam_user.github_actions_user.name
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = ["*"],
-        Resource = "*"
-      },
-      {
         Effect = "Allow",
         Action = [
-          "sts:AssumeRole",
-          "sts:TagSession",
-          "sts:AssumeRoleWithWebIdentity",
-          "sts:GetCallerIdentity"
+          "ecr:*",
+          "ecs:*",
+          "s3:*"
         ],
         Resource = "*"
       }
@@ -186,42 +159,47 @@ resource "aws_iam_policy" "github-actions" {
   })
 }
 
-# 1. Create OIDC provider (if doesn't exist)
-resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"] # July 2024 thumbprint
+# Output the secret key (only shown once after creation)
+output "secret_access_key" {
+  value     = aws_iam_access_key.github_actions_key.secret
+  sensitive = true
 }
+# # 1. Create OIDC provider (if doesn't exist)
+# resource "aws_iam_openid_connect_provider" "github" {
+#   url             = "https://token.actions.githubusercontent.com"
+#   client_id_list  = ["sts.amazonaws.com"]
+#   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"] # July 2024 thumbprint
+# }
 
-# 2. IAM Role with corrected trust policy
-resource "aws_iam_role" "github_actions" {
-  name               = "github-actions-role"
-  description        = "Role for GitHub Actions OIDC access"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
-      },
-      Action = "sts:AssumeRoleWithWebIdentity",
-      Condition = {
-        StringEquals = {
-          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-        },
-        StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:lovelord88/Terra-Infra-project:*"
-        }
-      }
-    }]
-  })
-}
+# # 2. IAM Role with corrected trust policy
+# resource "aws_iam_role" "github_actions" {
+#   name               = "github-actions-role"
+#   description        = "Role for GitHub Actions OIDC access"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [{
+#       Effect = "Allow",
+#       Principal = {
+#         Federated = aws_iam_openid_connect_provider.github.arn
+#       },
+#       Action = "sts:AssumeRoleWithWebIdentity",
+#       Condition = {
+#         StringEquals = {
+#           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+#         },
+#         StringLike = {
+#           "token.actions.githubusercontent.com:sub" = "repo:lovelord88/Terra-Infra-project:*"
+#         }
+#       }
+#     }]
+#   })
+# }
 
-# 3. Attach basic permissions (start with these)
-resource "aws_iam_role_policy_attachment" "github_actions" {
-  role       = aws_iam_role.github_actions.name
-  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess" # Start minimal
-}
+# # 3. Attach basic permissions (start with these)
+# resource "aws_iam_role_policy_attachment" "github_actions" {
+#   role       = aws_iam_role.github_actions.name
+#   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess" # Start minimal
+# }
 
 # # OIDC provider for GitHub Actions
 # resource "aws_iam_openid_connect_provider" "github" {
