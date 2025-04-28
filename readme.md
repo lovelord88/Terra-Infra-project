@@ -23,7 +23,7 @@ Below is a high-level view  of the AWS infrastructure and CI/CD process. It incl
 
 ## Architecture Diagram:
 
-![image alt](ASSIGNMENT-IMAGES/architercture_diagram.png)
+![imagealt](ASSIGNMENT-IMAGES/architercture_diagram.png)
 
 ---
 
@@ -32,7 +32,7 @@ Below is a high-level view  of the AWS infrastructure and CI/CD process. It incl
 To access the deployed application, please visit the URL:  
 **https://netflix.viviennedofit.com/**
 
-![Alt text]( ASSIGNMENT-IMAGES/docs.sreenshot.png"Screenshot of Netflix Website")
+![Alttext]( ASSIGNMENT-IMAGES/docs.sreenshot.png"Screenshot of Netflix Website")
 
 ---
 
@@ -91,7 +91,7 @@ The GitHub Actions workflows (`app.yml` and `infra.yml`) automate builds, vulner
       ignore-unfixed: true
       vuln-type: 'os,library'
       severity: 'HIGH'
-![Alt text](ASSIGNMENT-IMAGES/trivyscan.png"Screenshot of GitHub Trivy Scan")
+![Alttext](ASSIGNMENT-IMAGES/trivyscan.png"Screenshot of GitHub Trivy Scan")
 
 **SOC 2 Control Alignment**:
 - **CC7.1 (Detecting Vulnerabilities)**: Scanning ensures timely identification of known security issues.
