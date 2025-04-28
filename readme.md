@@ -23,16 +23,16 @@ Below is a high-level view  of the AWS infrastructure and CI/CD process. It incl
 
 ## Architecture Diagram:
 
-![image alt](https://github.com/lovelord88/Infra-ecs-project/blob/main/architercture_diagram))
+![image alt](ASSIGNMENT-IMAGES/architercture_diagram.png)
 
 ---
 
-<!-- ## Deployed Application
+## Deployed Application
 
 To access the deployed application, please visit the URL:  
-<!-- **https://netflix.viviennedofit./** -->
+**https://netflix.viviennedofit.com/**
 
-<!-- ![Alt text](docs/website.png "Screenshot of Netflix Website") --> -->
+![Alt text]( ASSIGNMENT-IMAGES/docs.sreenshot.png"Screenshot of Netflix Website")
 
 ---
 
@@ -48,18 +48,18 @@ Sensitive data and configuration values are managed securely throughout the setu
 - **GitHub Secrets & Variables**:  
   - Sensitive information such as AWS account ID, API keys, and other credentials are stored in GitHub Secrets.  
 
-![Alt text](https://github.com/lovelord88/Infra-ecs-project/blob/main/Screenshot%20from%202025-04-25%2020-33-59.png "Screenshot of GitHub Secrets")
+![Alt text](ASSIGNMENT-IMAGES/Secrets.png "Screenshot of GitHub Secrets")
 
   - Configuration parameters like `aws_region`, `container_name`, `ecr_repository`, `ecs_cluster_name`, and `ecs_service_name` are managed as GitHub variables.
 
-![Alt text](https://github.com/lovelord88/Infra-ecs-project/blob/main/Screenshot%20from%202025-04-25%2020-52-32.png "Screenshot of GitHub Variables")
+![Alt text](ASSIGNMENT-IMAGES/variables.png "Screenshot of GitHub Variables")
 
 - These practices ensure that sensitive data is not hardcoded in code, reducing exposure risk.
 
 - **AWS SSM Parameter Store**:  
   - Within the infrastructure setup (Terraform code), sensitive data—such as VPC IDs, subnet IDs, TLS certificate ARNs, etc.—are retrieved from AWS Systems Manager (SSM) Parameter Store. 
 
-![Alt text](https://github.com/lovelord88/Infra-ecs-project/blob/main/Screenshot%20from%202025-04-26%2013-40-57.png "Screenshot of Data Sources in Terraform")
+![Alt text](/home/vay/Pictures/Screenshots/data-sources.png "Screenshot of Data Sources in Terraform")
 
   - This avoids hardcoding sensitive information in infrastructure code, promoting secure and maintainable practices.
 
@@ -91,7 +91,7 @@ The GitHub Actions workflows (`app.yml` and `infra.yml`) automate builds, vulner
       ignore-unfixed: true
       vuln-type: 'os,library'
       severity: 'HIGH'
-
+![Alt text](ASSIGNMENT-IMAGES/trivyscan.png"Screenshot of GitHub Trivy Scan")
 
 **SOC 2 Control Alignment**:
 - **CC7.1 (Detecting Vulnerabilities)**: Scanning ensures timely identification of known security issues.
