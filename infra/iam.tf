@@ -138,7 +138,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 resource "aws_iam_role" "github_actions_role" {
-  name = "${var.name}transactly-github-actions-role"
+  name = "${var.name}-github-actions-role"
 
   # This is the only part that needs careful updating
   assume_role_policy = jsonencode({
@@ -160,9 +160,9 @@ resource "aws_iam_role" "github_actions_role" {
     }]
   })
 }
-resource "aws_iam_policy" "example" {
-  name        = "example-policy"
-  description = "Example IAM policy"
+resource "aws_iam_policy" "github-actions" {
+  name        = "transactly-github-actions"
+  description = "Github action IAM policy"
   
   policy = jsonencode({
     Version = "2012-10-17",
@@ -203,7 +203,7 @@ resource "aws_iam_role" "github-actions-role" {
     Statement = [{
       Effect = "Allow"
       Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
+        Federated = "aws_iam_openid_connect_provider.github.arn"
       }
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
