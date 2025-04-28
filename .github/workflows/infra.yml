@@ -40,8 +40,12 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: eu-north-1
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/GithubActions
-          role-session-name: github-actions
+          role-to-assume: role-to-assume:arn:aws:iam::711387141889:role/github-actions-role
+          role-session-name: github-${{ github.run_id }}
+        
+      - name: Verify access
+        run: aws sts get-caller-identity
+
 
       - uses: hashicorp/setup-terraform@v3
         with:
