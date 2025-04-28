@@ -137,7 +137,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"] # Current thumbprint
 }
 
-resource "aws_iam_role" "github_actions" {
+resource "aws_iam_role" "github_actions_role" {
   name = "${var.name}-github-actions-role"
 
   # This is the only part that needs careful updating
@@ -161,39 +161,58 @@ resource "aws_iam_role" "github_actions" {
   })
 }
 
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["*"],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sts:AssumeRole",
+        "sts:TagSession",
+        "sts:AssumeRoleWithWebIdentity",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
 
+# OIDC provider for GitHub Actions
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
 
-# # OIDC provider for GitHub Actions
-# resource "aws_iam_openid_connect_provider" "github" {
-#   url = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+}
 
-#   client_id_list  = ["sts.amazonaws.com"]
-#   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
-# }
+# Role GitHub Actions can assume
+resource "aws_iam_role" "github_actions" {
+  name = "${var.name}-github-actions-role"
 
-# # Role GitHub Actions can assume
-# resource "aws_iam_role" "github_actions" {
-#   name = "${var.name}-github-actions-role"
-
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Effect = "Allow"
-#       Principal = {
-#         Federated = aws_iam_openid_connect_provider.github.arn
-#       }
-#       Action = "sts:AssumeRoleWithWebIdentity"
-#       Condition = {
-#         StringLike = {
-#           "token.actions.githubusercontent.com:sub" : [
-#             "repo:lovelord88/Terra-Infra-project*",
-#             "repo:lovelord88/Terra-Infra-project:*"
-#           ]
-#         }
-#       }
-#     }]
-#   })
-# }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.github.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" : [
+            "repo:lovelord88/Terra-Infra-project*",
+            "repo:lovelord88/Terra-Infra-project:*"
+          ]
+        }
+      }
+    }]
+  })
+}
 
 # Attach necessary permissions — adjust as needed
 resource "aws_iam_role_policy_attachment" "github_actions_policy" {
