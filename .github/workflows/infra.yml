@@ -42,7 +42,7 @@ jobs:
           aws-region: eu-north-1
           role-to-assume: arn:aws:iam::711387141889:role/transactly-github-actions-role
           role-session-name: github-${{ github.run_id }}
-          role-source-account-id: ${{ secrets.AWS_ACCOUNT_ID }} 
+          role-source-account-id: 711387141889 
         
       - name: Verify access
         run: aws sts get-caller-identity
@@ -58,12 +58,12 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan
+        run: terraform plan --var-file="terraform.tfvars"
 
       - name: Terraform apply
         id: apply
         if: ${{ github.event.inputs.terraform_action == 'apply' }}
-        run: terraform apply --auto-approve
+        run: terraform apply --var-file="terraform.tfvars" --auto-approve
 
       - name: Terraform destroy
         id: destroy
