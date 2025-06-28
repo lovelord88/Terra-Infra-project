@@ -2,11 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.83.1"
+      version = ">= 6.0.0"
     }
   }
   backend "s3" {
-    bucket = "viviennedotsey-terraform-state"
+    bucket = "viviennedotsey-terraform-state-eu-n1"
     key    = "netflix/terraform.tfstate"
     region = "eu-north-1"
   }
